@@ -35,7 +35,7 @@ bool PmergeMe::parseArguments(int argc, char **argv)
 			return false;
 		}
 		long val = std::atol(s.c_str());
-		if (val <= 0)
+		if (val <= 0 || val > 2147483647)
 		{
 			return false;
 		}
@@ -55,37 +55,61 @@ void PmergeMe::_binaryInsert(T & dest, int val)
 template <typename T>
 void PmergeMe::_mergeInsertionSort(T & c)
 {
-	if (c.size() <= 1)
+	size_t n = c.size();
+	if (n <= 1)
 	{
 		return;
 	}
-	T main_chain, pendants;
-	for (size_t i = 0; i + 1 < c.size(); i += 2)
+
+	std::vector<std::pair<int, int> > pairs;
+	for (size_t i = 0; i + 1 < n; i += 2)
 	{
-		if (c[i] > c[i+1])
+		if (c[i] < c[i + 1])
 		{
-			main_chain.push_back(c[i]);
-			pendants.push_back(c[i+1]);
+			pairs.push_back(std::make_pair(c[i + 1], c[i]));
 		}
 		else
 		{
-			main_chain.push_back(c[i+1]);
-			pendants.push_back(c[i]);
+			pairs.push_back(std::make_pair(c[i], c[i + 1]));
 		}
 	}
-	int stray = (c.size() % 2 != 0) ? c.back() : -1;
+	
+	int stray = (n % 2 != 0) ? c.back() : -1;
+
+	T main_chain;
+	for (size_t i = 0; i < pairs.size(); i++)
+	{
+		main_chain.push_back(pairs[i].first);
+	}
+
 	_mergeInsertionSort(main_chain);
+
+	T pendants;
+	for (size_t i = 0; i < main_chain.size(); i++)
+	{
+		for (size_t j = 0; j < pairs.size(); j++)
+		{
+			if (main_chain[i] == pairs[j].first)
+			{
+				pendants.push_back(pairs[j].second);
+				pairs.erase(pairs.begin() + j);
+				break;
+			}
+		}
+	}
+
 	main_chain.insert(main_chain.begin(), pendants[0]);
-	size_t jacob[] = { 2, 6, 10, 22, 42, 86, 170, 342, 682, 1366 };
-	size_t last_inserted = 1;
-	for (int i = 0; i < 10; i++)
+
+	size_t jacob[] = {2, 6, 10, 22, 42, 86, 170, 342, 682, 1366, 2730, 5462, 10922};
+	size_t last_idx = 1;
+	for (size_t i = 0; i < 13; i++)
 	{
 		size_t target = jacob[i];
 		if (target >= pendants.size())
 		{
 			target = pendants.size() - 1;
 		}
-		for (size_t k = target; k > last_inserted; k--)
+		for (size_t k = target; k > last_idx; k--)
 		{
 			_binaryInsert(main_chain, pendants[k]);
 		}
@@ -93,8 +117,9 @@ void PmergeMe::_mergeInsertionSort(T & c)
 		{
 			break;
 		}
-		last_inserted = target;
+		last_idx = target;
 	}
+
 	if (stray != -1)
 	{
 		_binaryInsert(main_chain, stray);
@@ -105,31 +130,43 @@ void PmergeMe::_mergeInsertionSort(T & c)
 void PmergeMe::run()
 {
 	std::cout << "Before: ";
-	for (size_t i = 0; i < _vec.size() && i < 10; i++)
+	for (size_t i = 0; i < _vec.size(); i++)
 	{
-		std::cout << _vec[i] << " ";
-	}
-	if (_vec.size() > 10)
-	{
-		std::cout << "[...]";
+		if (i < 10)
+		{
+			std::cout << _vec[i] << " ";
+		}
+		else
+		{
+			std::cout << "[...] ";
+			break;
+		}
 	}
 	std::cout << std::endl;
-	clock_t start = clock();
+
+	clock_t v_start = clock();
 	_mergeInsertionSort(_vec);
-	_vecTime = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1e6;
-	start = clock();
+	_vecTime = static_cast<double>(clock() - v_start) / CLOCKS_PER_SEC * 1e6;
+
+	clock_t d_start = clock();
 	_mergeInsertionSort(_deq);
-	_deqTime = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1e6;
-	std::cout << "After: ";
-	for (size_t i = 0; i < _vec.size() && i < 10; i++)
+	_deqTime = static_cast<double>(clock() - d_start) / CLOCKS_PER_SEC * 1e6;
+
+	std::cout << "After:  ";
+	for (size_t i = 0; i < _vec.size(); i++)
 	{
-		std::cout << _vec[i] << " ";
-	}
-	if (_vec.size() > 10)
-	{
-		std::cout << "[...]";
+		if (i < 10)
+		{
+			std::cout << _vec[i] << " ";
+		}
+		else
+		{
+			std::cout << "[...] ";
+			break;
+		}
 	}
 	std::cout << std::endl;
+
 	std::cout << "Time to process " << _vec.size() << " elements with std::vector : " << _vecTime << " us" << std::endl;
-	std::cout << "Time to process " << _deq.size() << " elements with std::deque : " << _deqTime << " us" << std::endl;
+	std::cout << "Time to process " << _deq.size() << " elements with std::deque  : " << _deqTime << " us" << std::endl;
 }
