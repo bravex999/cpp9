@@ -35,7 +35,7 @@ bool PmergeMe::parseArguments(int argc, char **argv)
 			return false;
 		}
 		long val = std::atol(s.c_str());
-		if (val <= 0 || val > 2147483647)
+		if (val <= 0 || val > std::numeric_limits<int>::max())
 		{
 			return false;
 		}
@@ -56,7 +56,7 @@ template <typename T>
 void PmergeMe::_mergeInsertionSort(T & c)
 {
 	size_t n = c.size();
-	if (n <= 1)
+	if (n < 2)
 	{
 		return;
 	}
@@ -98,26 +98,32 @@ void PmergeMe::_mergeInsertionSort(T & c)
 		}
 	}
 
-	main_chain.insert(main_chain.begin(), pendants[0]);
-
-	size_t jacob[] = {2, 6, 10, 22, 42, 86, 170, 342, 682, 1366, 2730, 5462, 10922};
-	size_t last_idx = 1;
-	for (size_t i = 0; i < 13; i++)
+	if (!pendants.empty())
 	{
-		size_t target = jacob[i];
-		if (target >= pendants.size())
+		main_chain.insert(main_chain.begin(), pendants[0]);
+	}
+
+	std::vector<size_t> jacob;
+	jacob.push_back(1);
+	jacob.push_back(3);
+	while (jacob.back() < pendants.size())
+	{
+		jacob.push_back(jacob[jacob.size() - 1] + 2 * jacob[jacob.size() - 2]);
+	}
+
+	size_t last = 1;
+	for (size_t i = 1; i < jacob.size(); i++)
+	{
+		size_t curr = jacob[i];
+		if (curr > pendants.size())
 		{
-			target = pendants.size() - 1;
+			curr = pendants.size();
 		}
-		for (size_t k = target; k > last_idx; k--)
+		for (size_t j = curr; j > last; j--)
 		{
-			_binaryInsert(main_chain, pendants[k]);
+			_binaryInsert(main_chain, pendants[j - 1]);
 		}
-		if (target == pendants.size() - 1)
-		{
-			break;
-		}
-		last_idx = target;
+		last = curr;
 	}
 
 	if (stray != -1)
@@ -138,19 +144,19 @@ void PmergeMe::run()
 		}
 		else
 		{
-			std::cout << "[...] ";
+			std::cout << "[...]";
 			break;
 		}
 	}
 	std::cout << std::endl;
 
-	clock_t v_start = clock();
+	clock_t start_v = clock();
 	_mergeInsertionSort(_vec);
-	_vecTime = static_cast<double>(clock() - v_start) / CLOCKS_PER_SEC * 1e6;
+	_vecTime = static_cast<double>(clock() - start_v) / CLOCKS_PER_SEC * 1e6;
 
-	clock_t d_start = clock();
+	clock_t start_d = clock();
 	_mergeInsertionSort(_deq);
-	_deqTime = static_cast<double>(clock() - d_start) / CLOCKS_PER_SEC * 1e6;
+	_deqTime = static_cast<double>(clock() - start_d) / CLOCKS_PER_SEC * 1e6;
 
 	std::cout << "After:  ";
 	for (size_t i = 0; i < _vec.size(); i++)
@@ -161,7 +167,7 @@ void PmergeMe::run()
 		}
 		else
 		{
-			std::cout << "[...] ";
+			std::cout << "[...]";
 			break;
 		}
 	}

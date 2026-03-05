@@ -9,6 +9,8 @@
 # include <algorithm>
 # include <iterator>
 # include <utility>
+# include <cstdlib>
+# include <limits>
 
 class PmergeMe
 {
