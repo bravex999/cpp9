@@ -31,12 +31,14 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 	for (int i = 0; i < 10; i++)
 	{
 		if (i == 4 || i == 7) continue;
-		if (!std::isdigit(date[i])) return false;
+		if (!std::isdigit(date[i]))
+			return false;
 	}
 	int y = std::atoi(date.substr(0, 4).c_str());
 	int m = std::atoi(date.substr(5, 2).c_str());
 	int d = std::atoi(date.substr(8, 2).c_str());
-	if (y < 1 || m < 1 || m > 12 || d < 1) return false;
+	if (y < 1 || m < 1 || m > 12 || d < 1)
+		return false;
 	int days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) days[1] = 29;
 	return d <= days[m - 1];
@@ -49,7 +51,8 @@ static bool isValidValue(const std::string& str, double& val)
 	if (end == str.c_str() || *end != '\0')
 	{
 		while (*end && std::isspace(*end)) end++;
-		if (*end != '\0') return false;
+		if (*end != '\0')
+		return false;
 	}
 	return end != str.c_str();
 }
@@ -71,7 +74,11 @@ void BitcoinExchange::loadDatabase(const std::string& filename)
 void BitcoinExchange::processInput(const std::string& filename)
 {
 	std::ifstream file(filename.c_str());
-	if (!file.is_open()) { std::cerr << "Error: could not open file." << std::endl; return; }
+	if (!file.is_open())
+	{
+		std::cerr << "Error: could not open file." << std::endl;
+		return;
+	}
 	std::string line;
 	std::getline(file, line);
 	while (std::getline(file, line))
@@ -83,20 +90,19 @@ void BitcoinExchange::processInput(const std::string& filename)
 			continue;
 		}
 		std::string date = line.substr(0, sep);
-		size_t end = date.find_last_not_of(" \t");
-		if (end != std::string::npos)
-			date = date.substr(0, end + 1);
-		size_t beg = date.find_first_not_of(" \t");
-		if (beg != std::string::npos)
-			date = date.substr(beg);
+		date.erase(date.find_last_not_of(" \t") + 1);
+		date.erase(0, date.find_first_not_of(" \t"));
 		if (!_isValidDate(date))
 		{
 			std::cout << "Error: bad input => " << date << std::endl;
 			continue;
 		}
 		std::string valStr = line.substr(sep + 1);
-		double val;
-		if (!isValidValue(valStr, val))
+		char *end;
+		double val = std::strtod(valStr.c_str(), &end);
+		while (*end && std::isspace(*end))
+			end++;
+		if (*end || end == valStr.c_str())
 		{
 			std::cout << "Error: bad input => " << line << std::endl;
 			continue;
@@ -113,16 +119,11 @@ void BitcoinExchange::processInput(const std::string& filename)
 		}
 		std::map<std::string, float>::iterator it = _data.lower_bound(date);
 		if (it != _data.end() && it->first == date)
-		{
 			std::cout << date << " => " << val << " = " << (val * it->second) << std::endl;
-		}
+		else if (it == _data.begin())
+			std::cout << "Error: bad input => " << date << std::endl;
 		else
 		{
-			if (it == _data.begin())
-			{
-				std::cout << "Error: bad input => " << date << std::endl;
-				continue;
-			}
 			--it;
 			std::cout << date << " => " << val << " = " << (val * it->second) << std::endl;
 		}
