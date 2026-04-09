@@ -60,7 +60,7 @@ void PmergeMe::_sortVec(std::vector<int> & c)
 	if (c.size() < 2)
 		return;
  
-	// 1. Emparejar y separar en winners/pendants
+	
 	std::vector<std::pair<int, int> > pairs;
 	for (size_t i = 0; i + 1 < c.size(); i += 2)
 	{
@@ -79,7 +79,7 @@ void PmergeMe::_sortVec(std::vector<int> & c)
 	std::vector<std::pair<int, int> > savedPairs = pairs;
 	_sortVec(main_chain);
  
-	// 3. Reordenar pendants para mantener la relacion con main_chain
+	
 	std::vector<int> pend;
 	std::vector<std::pair<int, int> > tmp = savedPairs;
 	for (size_t i = 0; i < main_chain.size(); i++)
@@ -95,23 +95,23 @@ void PmergeMe::_sortVec(std::vector<int> & c)
 		}
 	}
  
-	// 4. Insertar pend[0] al inicio (es menor que main_chain[0])
+	
 	if (!pend.empty())
 		main_chain.insert(main_chain.begin(), pend[0]);
  
-	// Rastrear posicion de cada winner a_k en main_chain
+	
 	std::vector<size_t> pos(pend.size());
 	for (size_t i = 0; i < pend.size(); i++)
 		pos[i] = i + 1;
  
-	// 5. Secuencia de Jacobsthal para orden de insercion
+	
 	std::vector<size_t> jacob;
 	jacob.push_back(1);
 	jacob.push_back(3);
 	while (jacob.back() < pend.size())
 		jacob.push_back(jacob[jacob.size() - 1] + 2 * jacob[jacob.size() - 2]);
  
-	// 6. Insertar pendants con busqueda binaria acotada
+	
 	size_t last = 1;
 	for (size_t i = 1; i < jacob.size(); i++)
 	{
@@ -134,7 +134,7 @@ void PmergeMe::_sortVec(std::vector<int> & c)
 		last = curr;
 	}
  
-	// 7. Insertar stray si existe (sin cota, busqueda completa)
+	
 	if (hasStray)
 	{
 		std::vector<int>::iterator it = std::lower_bound(
