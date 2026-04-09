@@ -44,18 +44,6 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 	return d <= days[m - 1];
 }
  
-static bool isValidValue(const std::string& str, double& val)
-{
-	char *end;
-	val = std::strtod(str.c_str(), &end);
-	if (end == str.c_str() || *end != '\0')
-	{
-		while (*end && std::isspace(*end)) end++;
-		if (*end != '\0')
-		return false;
-	}
-	return end != str.c_str();
-}
  
 void BitcoinExchange::loadDatabase(const std::string& filename)
 {
