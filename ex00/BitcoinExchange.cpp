@@ -10,33 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
- /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   BitcoinExchange.cpp                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: chnaranj <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/04/01 16:46:58 by chnaranj          #+#    #+#             */
-/*   Updated: 2026/04/01 16:46:59 by chnaranj         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "BitcoinExchange.hpp"
-
+ 
 BitcoinExchange::BitcoinExchange() {}
-
+ 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& other) { *this = other; }
-
+ 
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
 {
 	if (this != &other)
 		this->_data = other._data;
 	return *this;
 }
-
+ 
 BitcoinExchange::~BitcoinExchange() {}
-
+ 
 bool BitcoinExchange::_isValidDate(const std::string& date) const
 {
 	if (date.length() != 10 || date[4] != '-' || date[7] != '-') return false;
@@ -53,42 +41,19 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 	if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) days[1] = 29;
 	return d <= days[m - 1];
 }
-
+ 
 static bool isValidValue(const std::string& str, double& val)
 {
-	size_t start = 0;
-	while (start < str.size() && std::isspace(str[start])) start++;
-	if (start == str.size()) return false;
-	size_t i = start;
-	if (str[i] == '-' || str[i] == '+') i++;
-	if (i == str.size()) return false;
-	bool hasDot = false;
-	bool hasDigit = false;
-	while (i < str.size())
+	char *end;
+	val = std::strtod(str.c_str(), &end);
+	if (end == str.c_str() || *end != '\0')
 	{
-		if (str[i] == '.')
-		{
-			if (hasDot) return false;
-			hasDot = true;
-		}
-		else if (std::isdigit(str[i]))
-			hasDigit = true;
-		else if (std::isspace(str[i]))
-			break;
-		else
-			return false;
-		i++;
+		while (*end && std::isspace(*end)) end++;
+		if (*end != '\0') return false;
 	}
-	while (i < str.size())
-	{
-		if (!std::isspace(str[i])) return false;
-		i++;
-	}
-	if (!hasDigit) return false;
-	val = std::atof(str.c_str());
-	return true;
+	return end != str.c_str();
 }
-
+ 
 void BitcoinExchange::loadDatabase(const std::string& filename)
 {
 	std::ifstream file(filename.c_str());
@@ -102,7 +67,7 @@ void BitcoinExchange::loadDatabase(const std::string& filename)
 			_data[line.substr(0, sep)] = std::atof(line.substr(sep + 1).c_str());
 	}
 }
-
+ 
 void BitcoinExchange::processInput(const std::string& filename)
 {
 	std::ifstream file(filename.c_str());
