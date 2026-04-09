@@ -42,6 +42,12 @@ void RPN::calculate(const std::string & expression)
 		{
 			continue;
 		}
+		if (c == '-' && i + 1 < expression.length() && std::isdigit(expression[i + 1]))
+		{
+    		i++;
+    		stack.push(-(expression[i] - '0'));
+    		continue;
+		}
 		if (std::isdigit(c))
 		{
 			stack.push(c - '0');
