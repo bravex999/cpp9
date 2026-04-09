@@ -10,6 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   PmergeMe.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: chnaranj <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/01 16:48:45 by chnaranj          #+#    #+#             */
+/*   Updated: 2026/04/01 16:48:47 by chnaranj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PMERGEME_HPP
 # define PMERGEME_HPP
 
@@ -17,12 +29,12 @@
 # include <vector>
 # include <deque>
 # include <string>
-# include <ctime>
 # include <algorithm>
 # include <iterator>
 # include <utility>
 # include <cstdlib>
 # include <limits>
+# include <sys/time.h>
 
 class PmergeMe
 {
@@ -32,10 +44,12 @@ private:
 	double _vecTime;
 	double _deqTime;
 
-	template <typename T>
-	void _mergeInsertionSort(T & container);
-	template <typename T>
-	void _binaryInsert(T & dest, int val);
+	void _mergeInsertionSortVec(std::vector<int> & c);
+	void _binaryInsertVec(std::vector<int> & dest, int val);
+	void _mergeInsertionSortDeq(std::deque<int> & c);
+	void _binaryInsertDeq(std::deque<int> & dest, int val);
+
+	static double getTime();
 
 public:
 	PmergeMe();
