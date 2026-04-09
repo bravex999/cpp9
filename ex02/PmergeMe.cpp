@@ -72,7 +72,7 @@ void PmergeMe::_sortVec(std::vector<int> & c)
 	bool hasStray = (c.size() % 2 != 0);
 	int stray = hasStray ? c.back() : -1;
  
-	// 2. Ordenar recursivamente los winners
+	
 	std::vector<int> main_chain;
 	for (size_t i = 0; i < pairs.size(); i++)
 		main_chain.push_back(pairs[i].first);
