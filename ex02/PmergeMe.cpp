@@ -39,6 +39,8 @@ double PmergeMe::getTime()
  
 bool PmergeMe::parseArguments(int argc, char **argv)
 {
+	_vecTime = 0;
+	_deqTime = 0;
 	for (int i = 1; i < argc; i++)
 	{
 		std::string s = argv[i];
@@ -47,8 +49,12 @@ bool PmergeMe::parseArguments(int argc, char **argv)
 		long val = std::atol(s.c_str());
 		if (val <= 0 || val > std::numeric_limits<int>::max())
 			return false;
+		double t = getTime();
 		_vec.push_back(static_cast<int>(val));
+		_vecTime += getTime() - t;
+		t = getTime();
 		_deq.push_back(static_cast<int>(val));
+		_deqTime += getTime() - t;
 	}
 	return true;
 }
