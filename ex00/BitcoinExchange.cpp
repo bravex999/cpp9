@@ -50,7 +50,8 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 void BitcoinExchange::loadDatabase(const std::string& filename)
 {
 	std::ifstream file(filename.c_str());
-	if (!file.is_open()) { std::cerr << "Error: could not open database." << std::endl; std::exit(1); }
+	if (!file.is_open())
+		{ std::cerr << "Error: could not open database." << std::endl; std::exit(1); }
 	std::string line;
 	std::getline(file, line);
 	while (std::getline(file, line))
