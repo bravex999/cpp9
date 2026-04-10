@@ -27,7 +27,8 @@ BitcoinExchange::~BitcoinExchange() {}
  
 bool BitcoinExchange::_isValidDate(const std::string& date) const
 {
-	if (date.length() != 10 || date[4] != '-' || date[7] != '-') return false;
+	if (date.length() != 10 || date[4] != '-' || date[7] != '-')
+		return false;
 	for (int i = 0; i < 10; i++)
 	{
 		if (i == 4 || i == 7) continue;
