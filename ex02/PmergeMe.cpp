@@ -252,11 +252,11 @@ void PmergeMe::run()
  
 	double t = getTime();
 	_sortVec(_vec);
-	_vecTime = getTime() - t;
- 
+	_vecTime += getTime() - t;
+
 	t = getTime();
 	_sortDeq(_deq);
-	_deqTime = getTime() - t;
+	_deqTime += getTime() - t;
  
 	std::cout << "After:  ";
 	for (size_t i = 0; i < _vec.size(); i++)
