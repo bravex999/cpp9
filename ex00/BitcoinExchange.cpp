@@ -42,7 +42,8 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 	if (y < 1 || m < 1 || m > 12 || d < 1)
 		return false;
 	int days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) days[1] = 29;
+	if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0))
+		days[1] = 29;
 	return d <= days[m - 1];
 }
  
