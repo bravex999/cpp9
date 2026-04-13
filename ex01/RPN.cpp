@@ -9,7 +9,6 @@
 /*   Updated: 2026/04/01 16:47:58 by chnaranj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "RPN.hpp"
 
 RPN::RPN()
@@ -44,9 +43,9 @@ void RPN::calculate(const std::string & expression)
 		}
 		if (c == '-' && i + 1 < expression.length() && std::isdigit(expression[i + 1]))
 		{
-    		i++;
-    		stack.push(-(expression[i] - '0'));
-    		continue;
+			i++;
+			stack.push(-(expression[i] - '0'));
+			continue;
 		}
 		if (std::isdigit(c))
 		{
@@ -65,19 +64,42 @@ void RPN::calculate(const std::string & expression)
 			stack.pop();
 			if (c == '+')
 			{
+				if ((b > 0 && a > 2147483647 - b) || (b < 0 && a < -2147483647 - 1 - b))
+				{
+					std::cerr << "Error" << std::endl;
+					return;
+				}
 				stack.push(a + b);
 			}
 			else if (c == '-')
 			{
+				if ((b < 0 && a > 2147483647 + b) || (b > 0 && a < -2147483647 - 1 + b))
+				{
+					std::cerr << "Error" << std::endl;
+					return;
+				}
 				stack.push(a - b);
 			}
 			else if (c == '*')
 			{
+				if (a != 0 && b != 0)
+				{
+					if ((a > 0 && b > 0 && a > 2147483647 / b) || (a > 0 && b < 0 && b < (-2147483647 - 1) / a) || (a < 0 && b > 0 && a < (-2147483647 - 1) / b) || (a < 0 && b < 0 && a < 2147483647 / b))
+					{
+						std::cerr << "Error" << std::endl;
+						return;
+					}
+				}
 				stack.push(a * b);
 			}
 			else
 			{
 				if (b == 0)
+				{
+					std::cerr << "Error" << std::endl;
+					return;
+				}
+				if (a == -2147483647 - 1 && b == -1)
 				{
 					std::cerr << "Error" << std::endl;
 					return;
